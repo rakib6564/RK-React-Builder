@@ -15,6 +15,23 @@ export const catalogFields: FieldDef[] = [
     key: "joined",
     label: "Join the cards into one bordered grid",
   },
+  {
+    kind: "number",
+    key: "pageSize",
+    label: "Cards shown first (0 shows all, the rest load with a button)",
+    min: 0,
+    max: 100,
+  },
+  { kind: "checkbox", key: "search", label: "Show a search box" },
+  {
+    kind: "select",
+    key: "tagField",
+    label: "Filter buttons come from",
+    options: [
+      { value: "blurb", label: "The end of the card text (after ' · ')" },
+      { value: "eyebrow", label: "The small label above the title" },
+    ],
+  },
   { kind: "number", key: "cols", label: "Columns", min: 2, max: 4 },
   { kind: "checkbox", key: "numbered", label: "Number the photos" },
   {

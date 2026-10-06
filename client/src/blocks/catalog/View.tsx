@@ -13,15 +13,24 @@ import {
 import type { CatalogProps } from "./schema";
 
 export function CatalogView({ props }: ViewProps<CatalogProps>) {
-  const rows = parseRows(props.items, 7, 24);
-  const modals = parseRows(props.modals ?? "", 4, 24);
+  const rows = parseRows(props.items, 7, 150);
+  const modals = parseRows(props.modals ?? "", 4, 150);
   const modalLabel = props.modalLabel || "View all products";
   const ctas = semi(props.modalCta ?? "", 2)
     .map(c => parseRows(c, 2, 1)[0])
     .filter(c => c && c[0] !== "" && safeHref(c[1]) !== "");
-  const tags = props.filters ? uniqueTags(rows.map(r => blurbTag(r[3]))) : [];
+  const byEyebrow = props.tagField === "eyebrow";
+  const tagOf = (r: string[]) => (byEyebrow ? r[1] : blurbTag(r[3]));
+  const tags = props.filters ? uniqueTags(rows.map(tagOf)) : [];
+  const pageSize = props.pageSize ?? 0;
+  const paged = pageSize > 0;
+  const searchLabel = props.searchLabel || "Search";
+  const pagerOn = paged || props.search === true;
   return (
-    <section className={`pf-section pf-catalog ${props.tone}`}>
+    <section
+      className={`pf-section pf-catalog ${props.tone}`}
+      {...(pagerOn ? { "data-page": pageSize } : {})}
+    >
       <div className="pf-wrap">
         {(props.eyebrow || props.heading || props.intro) && (
           <div className="pf-catalog-head">
@@ -32,6 +41,16 @@ export function CatalogView({ props }: ViewProps<CatalogProps>) {
                 {p}
               </p>
             ))}
+          </div>
+        )}
+        {props.search && (
+          <div className="pf-search">
+            <input
+              type="search"
+              placeholder={searchLabel}
+              aria-label={searchLabel}
+              data-search=""
+            />
           </div>
         )}
         {tags.length > 0 && (
@@ -129,20 +148,42 @@ export function CatalogView({ props }: ViewProps<CatalogProps>) {
                   </div>
                 </>
               );
-              const tag = props.filters ? blurbTag(blurb) : "";
+              const tag = props.filters ? tagOf(rows[i]) : "";
               const tagAttr = tag !== "" ? { "data-tag": tag } : {};
+              const hid = paged && i >= pageSize ? { hidden: true } : {};
               return href ? (
-                <a className="pf-card link" href={href} key={i} {...tagAttr}>
+                <a
+                  className="pf-card link"
+                  href={href}
+                  key={i}
+                  {...tagAttr}
+                  {...hid}
+                >
                   {body}
                 </a>
               ) : (
-                <article className="pf-card" key={i} {...tagAttr}>
+                <article className="pf-card" key={i} {...tagAttr} {...hid}>
                   {body}
                 </article>
               );
             }
           )}
         </div>
+        {pagerOn && (
+          <p className="pf-empty" hidden>
+            Nothing matches. Try a different word or category.
+          </p>
+        )}
+        {paged && rows.length > pageSize && (
+          <div className="pf-more-wrap">
+            <p className="pf-count" data-count="" aria-live="polite">
+              {`Showing ${pageSize} of ${rows.length}`}
+            </p>
+            <button type="button" className="pf-btn outline" data-more="">
+              Load more
+            </button>
+          </div>
+        )}
         {modals.map(([image, title, intro, items], i) => {
           if (title === "") return null;
           const src = safeImg(image);

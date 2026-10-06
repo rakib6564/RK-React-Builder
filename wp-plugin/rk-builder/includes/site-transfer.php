@@ -53,11 +53,11 @@ function rk_builder_bundle_media_refs( $layout, $theme = null ) {
 			if ( 'image' === $b['type'] ) { $add( isset( $p['mediaId'] ) ? $p['mediaId'] : null, isset( $p['url'] ) ? $p['url'] : null ); }
 			if ( 'hero' === $b['type'] || 'coverhero' === $b['type'] ) { $add( isset( $p['bgMediaId'] ) ? $p['bgMediaId'] : null, isset( $p['bgUrl'] ) ? $p['bgUrl'] : null ); }
 			if ( 'catalog' === $b['type'] || 'gallery' === $b['type'] ) {
-				foreach ( rk_builder_parse_rows( isset( $p['items'] ) ? $p['items'] : '', 'gallery' === $b['type'] ? 3 : 7, 40 ) as $r ) {
+				foreach ( rk_builder_parse_rows( isset( $p['items'] ) ? $p['items'] : '', 'gallery' === $b['type'] ? 3 : 7, 'gallery' === $b['type'] ? 300 : 150 ) as $r ) {
 					if ( '' !== $r[0] && ! rk_builder_is_hex( $r[0] ) ) { $add( null, $r[0] ); }
 				}
 				if ( 'catalog' === $b['type'] ) {
-					foreach ( rk_builder_parse_rows( isset( $p['modals'] ) ? $p['modals'] : '', 4, 24 ) as $r ) { if ( '' !== $r[0] ) { $add( null, $r[0] ); } }
+					foreach ( rk_builder_parse_rows( isset( $p['modals'] ) ? $p['modals'] : '', 4, 150 ) as $r ) { if ( '' !== $r[0] ) { $add( null, $r[0] ); } }
 				}
 			}
 			if ( 'sitefooter' === $b['type'] ) { $add( isset( $p['logoMediaId'] ) ? $p['logoMediaId'] : null, isset( $p['logoUrl'] ) ? $p['logoUrl'] : null ); }

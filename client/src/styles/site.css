@@ -1958,6 +1958,36 @@
   background: var(--site-ink);
   color: var(--site-bg);
 }
+/* Search box and "Load more" for long catalogs and galleries. */
+.pf-search {
+  margin: 0 0 20px;
+}
+.site-root .pf-search input {
+  width: 100%;
+  max-width: 420px;
+  padding: 13px 16px;
+  border: 1px solid color-mix(in srgb, var(--site-ink) 22%, transparent);
+  background: var(--site-bg);
+  color: var(--site-ink);
+  font: inherit;
+  font-size: 16px;
+}
+.pf-more-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 40px 0 0;
+}
+.pf-count {
+  margin: 0;
+  font-size: 14px;
+  color: color-mix(in srgb, var(--site-ink) 65%, transparent);
+}
+.pf-empty {
+  margin: 24px 0;
+  text-align: center;
+}
 .pf-catalog [hidden],
 .pf-gallery [hidden] {
   display: none !important;

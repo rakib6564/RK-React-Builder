@@ -94,4 +94,11 @@ export const galleryFields: FieldDef[] = [
     label: "Open a photo large when clicked",
   },
   { kind: "checkbox", key: "filters", label: "Show category buttons" },
+  {
+    kind: "number",
+    key: "pageSize",
+    label: "Photos shown first (0 shows all, the rest load with a button)",
+    min: 0,
+    max: 100,
+  },
 ];

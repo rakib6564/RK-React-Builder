@@ -167,24 +167,32 @@ function rk_builder_filters_html( array $tags ) {
 }
 
 function rk_builder_render_catalog( array $p, array $context = array() ) {
-	$rows_all = rk_builder_parse_rows( $p['items'], 7, 24 );
+	$rows_all = rk_builder_parse_rows( $p['items'], 7, 150 );
 	$filters  = ! empty( $p['filters'] );
-	$modals   = rk_builder_parse_rows( isset( $p['modals'] ) ? $p['modals'] : '', 4, 24 );
+	$modals   = rk_builder_parse_rows( isset( $p['modals'] ) ? $p['modals'] : '', 4, 150 );
 	$m_label  = ! empty( $p['modalLabel'] ) ? $p['modalLabel'] : 'View all products';
 	$ctas     = array();
 	foreach ( rk_builder_semi( isset( $p['modalCta'] ) ? $p['modalCta'] : '', 2 ) as $c ) {
 		$r = rk_builder_parse_rows( $c, 2, 1 );
 		if ( $r && '' !== $r[0][0] && '' !== rk_builder_safe_href( $r[0][1] ) ) { $ctas[] = $r[0]; }
 	}
+	$by_eyebrow = isset( $p['tagField'] ) && 'eyebrow' === $p['tagField'];
+	$tag_of     = function ( array $r ) use ( $by_eyebrow ) { return $by_eyebrow ? $r[1] : rk_builder_blurb_tag( $r[3] ); };
+	$page_size  = isset( $p['pageSize'] ) ? (int) $p['pageSize'] : 0;
+	$paged      = $page_size > 0;
+	$search     = ! empty( $p['search'] );
+	$s_label    = ! empty( $p['searchLabel'] ) ? $p['searchLabel'] : 'Search';
+	$pager_on   = $paged || $search;
 	$tags = array();
-	if ( $filters ) { foreach ( $rows_all as $r ) { $t = rk_builder_blurb_tag( $r[3] ); if ( '' !== $t && ! in_array( $t, $tags, true ) ) { $tags[] = $t; } } }
-	$html = '<section ' . rk_builder_root_attrs( 'catalog', 'pf-section pf-catalog ' . $p['tone'] ) . '><div class="pf-wrap">';
+	if ( $filters ) { foreach ( $rows_all as $r ) { $t = $tag_of( $r ); if ( '' !== $t && ! in_array( $t, $tags, true ) ) { $tags[] = $t; } } }
+	$html = '<section ' . rk_builder_root_attrs( 'catalog', 'pf-section pf-catalog ' . $p['tone'] ) . ( $pager_on ? ' data-page="' . $page_size . '"' : '' ) . '><div class="pf-wrap">';
 	if ( '' !== $p['eyebrow'] || '' !== $p['heading'] || '' !== $p['intro'] ) {
 		$html .= '<div class="pf-catalog-head">';
 		if ( '' !== $p['eyebrow'] ) { $html .= '<p class="pf-kicker">' . rk_builder_h( $p['eyebrow'] ) . '</p>'; }
 		if ( '' !== $p['heading'] ) { $html .= '<h2>' . rk_builder_h( $p['heading'] ) . '</h2>'; }
 		$html .= rk_builder_paragraphs_html( $p['intro'] ) . '</div>';
 	}
+	if ( $search ) { $html .= '<div class="pf-search"><input type="search" placeholder="' . rk_builder_h( $s_label ) . '" aria-label="' . rk_builder_h( $s_label ) . '" data-search=""/></div>'; }
 	$html .= rk_builder_filters_html( $tags );
 	$html .= '<div class="' . ( ! empty( $p['joined'] ) ? 'pf-cards joined' : 'pf-cards' ) . '" style="grid-template-columns:repeat(' . (int) $p['cols'] . ', minmax(0, 1fr))">';
 	foreach ( $rows_all as $i => $r ) {
@@ -224,11 +232,15 @@ function rk_builder_render_catalog( array $p, array $context = array() ) {
 			$body .= '<button type="button" class="pf-open" data-modal-open="' . $i . '">' . rk_builder_h( $m_label ) . rk_builder_arrow_right_icon() . '</button>';
 		}
 		$body .= '</div>';
-		$tag      = $filters ? rk_builder_blurb_tag( $blurb ) : '';
-		$tag_attr = '' !== $tag ? ' data-tag="' . rk_builder_h( $tag ) . '"' : '';
+		$tag      = $filters ? $tag_of( $r ) : '';
+		$tag_attr = ( '' !== $tag ? ' data-tag="' . rk_builder_h( $tag ) . '"' : '' ) . ( $paged && $i >= $page_size ? ' hidden=""' : '' );
 		$html .= '' !== $href ? '<a class="pf-card link" href="' . $href . '"' . $tag_attr . '>' . $body . '</a>' : '<article class="pf-card"' . $tag_attr . '>' . $body . '</article>';
 	}
 	$html .= '</div>';
+	if ( $pager_on ) { $html .= '<p class="pf-empty" hidden="">Nothing matches. Try a different word or category.</p>'; }
+	if ( $paged && count( $rows_all ) > $page_size ) {
+		$html .= '<div class="pf-more-wrap"><p class="pf-count" data-count="" aria-live="polite">Showing ' . $page_size . ' of ' . count( $rows_all ) . '</p><button type="button" class="pf-btn outline" data-more="">Load more</button></div>';
+	}
 	foreach ( $modals as $i => $m ) {
 		list( $m_image, $m_title, $m_intro, $m_items ) = $m;
 		if ( '' === $m_title ) { continue; }
@@ -354,18 +366,21 @@ function rk_builder_render_gallery( array $p, array $context = array() ) {
 	$figs    = '';
 	$tags    = array();
 	$n       = 0;
+	$page_size = isset( $p['pageSize'] ) ? (int) $p['pageSize'] : 0;
 	$source = isset( $p['source'] ) ? $p['source'] : 'manual';
 	$rows   = 'manual' === $source ? rk_builder_parse_rows( $p['items'], 3, 300 ) : rk_builder_gallery_auto_rows( $p, $context );
 	foreach ( $rows as $r ) {
 		if ( '' === $r[0] || '' === rk_builder_src( $r[0] ) ) { continue; }
 		$cap = '' !== $r[1] && '' !== $r[2] ? $r[1] . ' · ' . $r[2] : ( '' !== $r[1] ? $r[1] : $r[2] );
 		if ( $filters && '' !== $r[1] && ! in_array( $r[1], $tags, true ) ) { $tags[] = $r[1]; }
-		$attrs = ( 0 === $n && $featured ? ' class="big"' : '' ) . ( $filters && '' !== $r[1] ? ' data-tag="' . rk_builder_h( $r[1] ) . '"' : '' ) . ( $lightbox ? ' tabindex="0"' : '' );
+		$attrs = ( 0 === $n && $featured ? ' class="big"' : '' ) . ( $filters && '' !== $r[1] ? ' data-tag="' . rk_builder_h( $r[1] ) . '"' : '' ) . ( $lightbox ? ' tabindex="0"' : '' ) . ( $page_size > 0 && $n >= $page_size ? ' hidden=""' : '' );
 		$figs .= '<figure' . $attrs . '><img src="' . rk_builder_src( $r[0] ) . '" alt="' . rk_builder_h( $r[2] ) . '" decoding="async" loading="lazy"/>' . ( '' !== $cap ? '<figcaption>' . rk_builder_h( $cap ) . '</figcaption>' : '' ) . '</figure>';
 		$n++;
 	}
-	$html = '<section ' . rk_builder_root_attrs( 'gallery', rk_builder_gallery_classes( $p ) ) . '>';
-	if ( $tags ) { return $html . '<div class="pf-wrap">' . rk_builder_filters_html( $tags ) . '<div class="pf-gallery-grid">' . $figs . '</div></div></section>'; }
+	$html = '<section ' . rk_builder_root_attrs( 'gallery', rk_builder_gallery_classes( $p ) ) . ( $page_size > 0 ? ' data-page="' . $page_size . '"' : '' ) . '>';
+	$more = $page_size > 0 && $n > $page_size ? '<div class="pf-more-wrap"><p class="pf-count" data-count="" aria-live="polite">Showing ' . $page_size . ' of ' . $n . '</p><button type="button" class="pf-btn outline" data-more="">Load more</button></div>' : '';
+	if ( $tags ) { return $html . '<div class="pf-wrap">' . rk_builder_filters_html( $tags ) . '<div class="pf-gallery-grid">' . $figs . '</div>' . $more . '</div></section>'; }
+	if ( '' !== $more ) { return $html . '<div class="pf-wrap"><div class="pf-gallery-grid">' . $figs . '</div>' . $more . '</div></section>'; }
 	return $html . '<div class="pf-wrap pf-gallery-grid">' . $figs . '</div></section>';
 }
 

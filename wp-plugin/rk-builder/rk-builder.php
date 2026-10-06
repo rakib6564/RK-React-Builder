@@ -2,7 +2,7 @@
 /**
  * Plugin Name: RK Builder (All-in-One)
  * Description: Visual page builder in one plugin: React editor inside wp-admin, strict layout validation, draft/publish with revisions, preview links, PHP public rendering, Service/Portfolio content types. No Node.js required.
- * Version: 1.39.0
+ * Version: 1.40.0
  * Author: Rakib Hasan
  * Requires PHP: 7.4
  * Requires at least: 5.5
@@ -14,7 +14,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-define( 'RK_BUILDER_VERSION', '1.39.0' );
+define( 'RK_BUILDER_VERSION', '1.40.0' );
 define( 'RK_BUILDER_NS', 'rk/v1' );
 define( 'RK_BUILDER_DIR', __DIR__ . '/' );
 if ( ! defined( 'RK_BUILDER_URL' ) ) { define( 'RK_BUILDER_URL', function_exists( 'plugin_dir_url' ) ? plugin_dir_url( __FILE__ ) : '' ); }

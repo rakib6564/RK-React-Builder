@@ -41,6 +41,8 @@ export const galleryProps = z.strictObject({
   limit: z.number().int().min(1).max(40).optional(),
   /** Automatic galleries: a category slug for projects / services, or words to find in the media library. */
   filter: text(0, 80).optional(),
+  /** Show this many photos first and a "Load more" button for the rest; 0 or absent shows them all. */
+  pageSize: z.number().int().min(0).max(100).optional(),
 });
 export type GalleryProps = z.infer<typeof galleryProps>;
 export const galleryDefaults: GalleryProps = {
@@ -55,6 +57,7 @@ export const galleryDefaults: GalleryProps = {
   source: "manual",
   limit: 12,
   filter: "",
+  pageSize: 0,
 };
 
 /** "hardwood-floors" -> "Hardwood Floors": the filter button text for a category slug. */

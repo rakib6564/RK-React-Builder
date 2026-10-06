@@ -14,7 +14,7 @@ import {
 import { HEX, blurbTag, parseRows, semi } from "@/blocks/links";
 import { MediaPicker } from "./MediaPicker";
 
-const MAX_CARDS = 24;
+const MAX_CARDS = 150;
 
 type Card = {
   image: string;

@@ -47,6 +47,35 @@
         "props": {
           "items": "https://cms.example.com/uploads/a.jpg|Installation|Warm hardwood floor"
         }
+      },
+      {
+        "id": "gal-page",
+        "type": "gallery",
+        "props": {
+          "items": "https://cms.example.com/uploads/a.jpg||One\nhttps://cms.example.com/uploads/b.jpg||Two\nhttps://cms.example.com/uploads/c.jpg||Three",
+          "shape": "square",
+          "lightbox": true,
+          "captions": "none",
+          "pageSize": 2
+        }
+      },
+      {
+        "id": "cat-page",
+        "type": "catalog",
+        "props": {
+          "eyebrow": "",
+          "heading": "",
+          "intro": "",
+          "items": "https://cms.example.com/uploads/a.jpg|Oak|Red Oak|||| \nhttps://cms.example.com/uploads/b.jpg|Maple|Hard Maple||||\nhttps://cms.example.com/uploads/c.jpg|Oak|White Oak||||",
+          "cols": 3,
+          "tone": "light",
+          "numbered": false,
+          "filters": true,
+          "pageSize": 2,
+          "search": true,
+          "searchLabel": "Search wood types",
+          "tagField": "eyebrow"
+        }
       }
     ]
   }

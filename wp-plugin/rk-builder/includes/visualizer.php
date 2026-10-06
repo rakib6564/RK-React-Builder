@@ -358,7 +358,15 @@ function rk_builder_viz_start( array $s, array $upload, array $options ) {
 	$prompt = rk_builder_viz_prompt( $options );
 	$fail   = function ( $detail ) {
 		if ( function_exists( 'error_log' ) ) { error_log( '[rk-builder visualizer] ' . $detail ); }
-		return rk_builder_viz_error( 'rk_viz_provider', 'We couldn\'t generate the visualization right now. Please try again.', 502 );
+		$msg = 'We couldn\'t generate the visualization right now. Please try again.';
+		// Only a signed-in administrator sees why (the provider's own words, never a key), so a wrong key or quota is easy to spot.
+		if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
+			foreach ( array( rk_builder_viz_gemini_key( $s ), rk_builder_viz_hf_token( $s ), isset( $s['custom_key'] ) ? (string) $s['custom_key'] : '' ) as $secret ) {
+				if ( strlen( $secret ) > 6 ) { $detail = str_replace( $secret, '[key]', $detail ); }
+			}
+			$msg .= ' (Administrator detail: ' . substr( $detail, 0, 300 ) . ')';
+		}
+		return rk_builder_viz_error( 'rk_viz_provider', $msg, 502 );
 	};
 	if ( 'mock' === $s['provider'] ) {
 		$url = rk_builder_viz_store_image( (string) file_get_contents( $upload['path'] ) );
