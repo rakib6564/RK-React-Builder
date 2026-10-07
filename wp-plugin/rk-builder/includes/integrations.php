@@ -233,6 +233,7 @@ function rk_builder_review_clean( $r ) {
 		'date'    => rk_builder_theme_text( isset( $r['date'] ) ? $r['date'] : '', 40 ),
 		'source'  => $src,
 		'url'     => rk_builder_int_url( isset( $r['url'] ) ? $r['url'] : '' ),
+		'photo'   => rk_builder_int_url( isset( $r['photo'] ) ? $r['photo'] : '' ),
 		'hidden'  => ! empty( $r['hidden'] ),
 	);
 }
@@ -244,6 +245,7 @@ function rk_builder_reviews_write_url( $place_id ) {
 
 /** What the block and the public endpoint show: visible reviews, summary and links. */
 function rk_builder_reviews_public( $limit = 6, $min = 1 ) {
+	$limit = min( 50, max( 1, (int) $limit ) );
 	$s     = rk_builder_reviews_store();
 	$items = array();
 	foreach ( $s['items'] as $r ) {
@@ -363,6 +365,7 @@ function rk_builder_reviews_sync() {
 			'date'   => isset( $rv['relativePublishTimeDescription'] ) ? $rv['relativePublishTimeDescription'] : '',
 			'source' => 'google',
 			'url'    => isset( $rv['authorAttribution']['uri'] ) ? $rv['authorAttribution']['uri'] : '',
+			'photo'  => isset( $rv['authorAttribution']['photoUri'] ) ? $rv['authorAttribution']['photoUri'] : '',
 			'hidden' => isset( $keep_hidden[ 'g' . substr( hash( 'sha256', $name ), 0, 16 ) ] ),
 		) );
 		if ( null !== $r ) { $google[] = $r; }
@@ -392,7 +395,7 @@ function rk_builder_reviews_schedule() {
 }
 
 function rk_builder_handle_public_reviews( $req ) {
-	$data = rk_builder_reviews_public( 12, 1 );
+	$data = rk_builder_reviews_public( 50, 1 );
 	$res  = rest_ensure_response( $data );
 	$res->header( 'Cache-Control', 'public, max-age=0, s-maxage=300' );
 	return $res;

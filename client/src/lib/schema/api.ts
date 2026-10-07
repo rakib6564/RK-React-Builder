@@ -599,6 +599,7 @@ export const ReviewItem = z.object({
   date: z.string(),
   source: z.string(),
   url: z.string(),
+  photo: z.string().optional(),
   hidden: z.boolean(),
 });
 export type ReviewItem = z.infer<typeof ReviewItem>;

@@ -448,12 +448,85 @@ function rk_builder_review_clip( $s, $n ) {
 	return rk_builder_strlen( $s ) > $n ? rtrim( rk_builder_substr( $s, 0, $n - 1 ) ) . '…' : $s;
 }
 
+/** The Google "G" mark. Mirrors GoogleG() in blocks/reviews/View.tsx. */
+function rk_builder_google_g( $size ) {
+	return '<svg xmlns="http://www.w3.org/2000/svg" width="' . (int) $size . '" height="' . (int) $size . '" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>';
+}
+
+/** The word above the score on the badge layout. Mirrors ratingLabel() in blocks/reviews/View.tsx. */
+function rk_builder_review_label( $rating ) {
+	return $rating >= 4.5 ? 'Excellent' : ( $rating >= 4 ? 'Great' : ( $rating >= 3 ? 'Good' : 'Rated' ) );
+}
+
+/** "Google" in the brand colours, then " Reviews". Mirrors Wordmark() in blocks/reviews/View.tsx. */
+function rk_builder_review_wordmark() {
+	$h = '<b class="rv-wm">';
+	foreach ( str_split( 'Google' ) as $c ) { $h .= '<span>' . $c . '</span>'; }
+	return $h . ' Reviews</b>';
+}
+
+/** One card of the Google-style widget. Mirrors WidgetCard() in blocks/reviews/View.tsx. */
+function rk_builder_review_card( array $r, $i ) {
+	$photo   = isset( $r['photo'] ) && '' !== $r['photo'] ? rk_builder_src( $r['photo'] ) : '';
+	$initial = function_exists( 'mb_strtoupper' ) ? mb_strtoupper( rk_builder_substr( $r['author'], 0, 1 ) ) : strtoupper( substr( $r['author'], 0, 1 ) );
+	$html    = '<article class="rv-card"><div class="rv-top"><span class="rv-ava"><span class="rv-avatar c' . ( $i % 6 ) . '">';
+	$html   .= '' !== $photo ? '<img src="' . $photo . '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"/>' : rk_builder_h( $initial );
+	$html   .= '</span>';
+	if ( 'google' === $r['source'] ) { $html .= '<span class="rv-gb">' . rk_builder_google_g( 14 ) . '</span>'; }
+	$html   .= '</span><span class="rv-who"><strong>' . rk_builder_h( $r['author'] ) . '</strong>' . ( '' !== $r['date'] ? '<small>' . rk_builder_h( $r['date'] ) . '</small>' : '' ) . '</span></div>' . rk_builder_stars( $r['rating'] );
+	if ( '' !== $r['text'] ) { $html .= '<p class="rv-text">' . rk_builder_h( $r['text'] ) . '</p><button type="button" class="rv-more" hidden="">Read more</button>'; }
+	return $html . '</article>';
+}
+
 /** The Google reviews block. Mirrors blocks/reviews/View.tsx. */
 function rk_builder_render_reviews( array $p, array $context = array() ) {
-	$data    = rk_builder_reviews_public( 12, (int) $p['minRating'] );
+	$data    = rk_builder_reviews_public( 50, (int) $p['minRating'] );
 	$items   = array_slice( $data['items'], 0, (int) $p['limit'] );
 	$profile = rk_builder_safe_href( $data['links']['profile'] );
 	$write   = rk_builder_safe_href( $data['links']['write'] );
+	$layout  = isset( $p['layout'] ) ? $p['layout'] : 'grid';
+	$head    = '';
+	if ( '' !== $p['eyebrow'] || '' !== $p['heading'] || '' !== $p['intro'] ) {
+		$head = '<div class="pf-center">';
+		if ( '' !== $p['eyebrow'] ) { $head .= '<p class="pf-kicker">' . rk_builder_h( $p['eyebrow'] ) . '</p>'; }
+		if ( '' !== $p['heading'] ) { $head .= '<h2>' . rk_builder_h( $p['heading'] ) . '</h2>'; }
+		if ( '' !== $p['intro'] ) { $head .= '<p class="pf-intro">' . rk_builder_h( $p['intro'] ) . '</p>'; }
+		$head .= '</div>';
+	}
+	if ( 'badge' === $layout ) {
+		$html = '<section ' . rk_builder_root_attrs( 'reviews', 'pf-section pf-reviews ' . $p['tone'] . ' rv-widget rv-badge-layout' ) . '><div class="pf-wrap">' . $head;
+		$n    = (int) $data['summary']['count'];
+		if ( $n > 0 ) {
+			$rating = (float) $data['summary']['rating'];
+			$inner  = rk_builder_google_g( 34 ) . '<strong class="rv-label">' . rk_builder_h( rk_builder_review_label( $rating ) . ' on Google' ) . '</strong><span class="rv-score"><b>' . number_format( $rating, 1, '.', '' ) . '</b>' . rk_builder_stars( $rating ) . '</span><span class="rv-count">' . $n . ' review' . ( 1 === $n ? '' : 's' ) . '</span>';
+			$href   = '' !== $profile ? $profile : $write;
+			$html  .= '<div class="rv-badge-wrap">' . ( '' !== $href ? '<a class="rv-badge" href="' . $href . '" target="_blank" rel="noopener noreferrer">' . $inner . '</a>' : '<div class="rv-badge">' . $inner . '</div>' ) . '</div>';
+		}
+		return $html . '</div></section>';
+	}
+	if ( in_array( $layout, array( 'carousel', 'cards', 'masonry', 'list', 'slider' ), true ) ) {
+		$slide = 'carousel' === $layout || 'slider' === $layout;
+		$has   = $items || $data['summary']['count'] > 0;
+		$html  = '<section ' . rk_builder_root_attrs( 'reviews', 'pf-section pf-reviews ' . $p['tone'] . ' rv-widget rv-' . $layout . ' rv-c' . (int) $p['cols'] ) . '><div class="pf-wrap">' . $head;
+		if ( $has ) {
+			$html .= '<div class="rv-shell"><div class="rv-head"><div class="rv-meta">' . rk_builder_review_wordmark();
+			if ( ! empty( $p['showSummary'] ) && $data['summary']['count'] > 0 ) {
+				$html .= '<span class="rv-rate"><strong>' . number_format( (float) $data['summary']['rating'], 1, '.', '' ) . '</strong>' . rk_builder_stars( $data['summary']['rating'] ) . '<span>(' . (int) $data['summary']['count'] . ')</span></span>';
+			}
+			$html .= '</div>';
+			if ( ! empty( $p['showLinks'] ) && '' !== $write ) { $html .= '<a class="rv-write" href="' . $write . '" target="_blank" rel="noopener noreferrer">Review us on Google</a>'; }
+			$html .= '</div><div class="rv-carousel">';
+			if ( $slide ) { $html .= '<button type="button" class="rv-nav prev" aria-label="Previous reviews">‹</button>'; }
+			$html .= '<div class="rv-track">';
+			foreach ( $items as $i => $r ) { $html .= rk_builder_review_card( $r, $i ); }
+			$html .= '</div>';
+			if ( $slide ) { $html .= '<button type="button" class="rv-nav next" aria-label="Next reviews">›</button>'; }
+			$html .= '</div>';
+			if ( ! empty( $p['showLinks'] ) && '' !== $profile ) { $html .= '<p class="rv-all"><a href="' . $profile . '" target="_blank" rel="noopener noreferrer">See all reviews on Google</a></p>'; }
+			$html .= '</div>';
+		}
+		return $html . '</div></section>';
+	}
 	$html    = '<section ' . rk_builder_root_attrs( 'reviews', 'pf-section pf-reviews ' . $p['tone'] ) . '><div class="pf-wrap">';
 	if ( '' !== $p['eyebrow'] || '' !== $p['heading'] || '' !== $p['intro'] ) {
 		$html .= '<div class="pf-center">';

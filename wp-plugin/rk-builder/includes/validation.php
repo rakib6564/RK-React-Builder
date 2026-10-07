@@ -390,7 +390,7 @@ function rk_builder_block_specs() {
 		),
 		'calculator' => array( 'heading' => rk_builder_f_text( 0, 120 ), 'types' => rk_builder_f_text( 0, 1200 ), 'amount' => rk_builder_f_int( 1, 100000 ), 'resultLabel' => rk_builder_f_text( 0, 60 ), 'note' => rk_builder_f_text( 0, 400 ), 'ctaLabel' => rk_builder_f_text( 0, 60 ), 'ctaHref' => rk_builder_f_link() ),
 		'visualizer' => array( 'cities' => rk_builder_f_text( 0, 800 ), 'submitLabel' => rk_builder_f_text( 1, 80 ), 'ctaLabel' => rk_builder_f_text( 0, 80 ), 'ctaHref' => rk_builder_f_link() ),
-		'reviews'    => array( 'eyebrow' => rk_builder_f_text( 0, 80 ), 'heading' => rk_builder_f_text( 0, 200 ), 'intro' => rk_builder_f_text( 0, 300 ), 'limit' => rk_builder_f_int( 1, 12 ), 'minRating' => rk_builder_f_int( 1, 5 ), 'cols' => rk_builder_f_int( 2, 3 ), 'showSummary' => rk_builder_f_bool(), 'showLinks' => rk_builder_f_bool(), 'tone' => rk_builder_f_enum( array( 'light', 'muted' ) ) ),
+		'reviews'    => array( 'eyebrow' => rk_builder_f_text( 0, 80 ), 'heading' => rk_builder_f_text( 0, 200 ), 'intro' => rk_builder_f_text( 0, 300 ), 'limit' => rk_builder_f_int( 1, 50 ), 'minRating' => rk_builder_f_int( 1, 5 ), 'cols' => rk_builder_f_int( 2, 4 ), 'showSummary' => rk_builder_f_bool(), 'showLinks' => rk_builder_f_bool(), 'tone' => rk_builder_f_enum( array( 'light', 'muted' ) ), 'layout' => rk_builder_f_enum( array( 'grid', 'carousel', 'cards', 'masonry', 'list', 'slider', 'badge' ), true ) ),
 		'dynfield'   => array(
 			'source'   => rk_builder_f_pattern( rk_builder_dyn_source_re() ),
 			'tag'      => rk_builder_f_enum( array( 'h1', 'h2', 'h3', 'h4', 'p', 'div', 'span' ) ),

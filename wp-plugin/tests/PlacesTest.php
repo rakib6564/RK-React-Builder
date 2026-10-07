@@ -143,3 +143,33 @@ rk_test( 'places link: a short link Google will not open is explained and nothin
 	t_err( rk_post( '/rk/v1/builder/places/link', array( 'url' => 'https://share.google/Zzzzzzzz' ) ), 'rk_upstream', 422 );
 	t_eq( rk_builder_reviews_store()['profileUrl'], 'https://old.example/p' );
 } );
+
+rk_test( 'places: a Maps link with a feature id gives the Place ID without any key', function () {
+	t_eq( 'ChIJOz6gO_Uts1IRYXYcjtXKV4Q', rk_builder_places_fid_to_place_id( '52b32df53ba03e3b', '8457cad58e1c7661' ) );
+	t_eq( 'ChIJN1t_tDeuEmsR', substr( rk_builder_places_fid_to_place_id( '6b12ae37b47f5b37', '8eaddfcd1b32ca52' ), 0, 16 ) );
+	$i = rk_builder_places_parse_link( 'https://www.google.com/maps/place/Peoria+Hardwood+Floors/@45.9,-91.7,6z/data=!3m1!4b1!4m6!3m5!1s0x52b32df53ba03e3b:0x8457cad58e1c7661!8m2!3d45.9!4d-91.7' );
+	t_eq( 'ChIJOz6gO_Uts1IRYXYcjtXKV4Q', $i['placeId'] );
+	t_eq( '', rk_builder_places_fid_to_place_id( 'zz', '12' ) );
+} );
+
+rk_test( 'reviews widget: header, rating, cards with photo or initial, write link, carousel buttons; plain grid is unchanged', function () {
+	rk_test_login( 'admin' );
+	update_option( 'rk_builder_reviews', array( 'placeId' => 'ChIJabcdefghijk123', 'profileUrl' => 'https://maps.google.com/?cid=1', 'summary' => array( 'rating' => 5.0, 'count' => 18 ), 'items' => array(
+		array( 'id' => 'g1', 'author' => 'Ann Lee', 'rating' => 5, 'text' => 'Great floors', 'date' => '2 weeks ago', 'source' => 'google', 'url' => '', 'photo' => 'https://lh3.googleusercontent.com/a/x', 'hidden' => false ),
+		array( 'id' => 'm1', 'author' => 'bob', 'rating' => 5, 'text' => '', 'date' => '', 'source' => 'manual', 'url' => '', 'photo' => '', 'hidden' => false ),
+	) ) );
+	$p = array( 'eyebrow' => '', 'heading' => '', 'intro' => '', 'limit' => 8, 'minRating' => 1, 'cols' => 3, 'showSummary' => true, 'showLinks' => true, 'tone' => 'light', 'layout' => 'carousel' );
+	$h = rk_builder_render_reviews( $p );
+	t_assert( false !== strpos( $h, 'rv-widget rv-carousel rv-c3' ) && false !== strpos( $h, 'class="rv-wm"' ) && false !== strpos( $h, '<strong>5.0</strong>' ) && false !== strpos( $h, '(18)' ) );
+	t_assert( false !== strpos( $h, 'Review us on Google' ) && false !== strpos( $h, 'rv-nav prev' ) && false !== strpos( $h, 'referrerpolicy="no-referrer"' ) );
+	t_assert( false !== strpos( $h, '>B</span>' ) && 1 === substr_count( $h, 'class="rv-more"' ) );
+	$c = rk_builder_render_reviews( array_merge( $p, array( 'layout' => 'cards' ) ) );
+	t_assert( false === strpos( $c, 'rv-nav' ) && false !== strpos( $c, 'rv-cards' ) );
+	$g = rk_builder_render_reviews( array_diff_key( $p, array( 'layout' => 1 ) ) );
+	t_assert( false === strpos( $g, 'rv-widget' ) && false !== strpos( $g, 'pf-rv-grid' ) );
+	foreach ( array( 'masonry', 'list' ) as $l ) { $x = rk_builder_render_reviews( array_merge( $p, array( 'layout' => $l ) ) ); t_assert( false !== strpos( $x, 'rv-' . $l . ' rv-c3' ) && false === strpos( $x, 'rv-nav' ) ); }
+	$sl = rk_builder_render_reviews( array_merge( $p, array( 'layout' => 'slider' ) ) );
+	t_assert( false !== strpos( $sl, 'rv-slider' ) && false !== strpos( $sl, 'rv-nav next' ) );
+	$bd = rk_builder_render_reviews( array_merge( $p, array( 'layout' => 'badge' ) ) );
+	t_assert( false !== strpos( $bd, 'Excellent on Google' ) && false !== strpos( $bd, '18 reviews' ) && false === strpos( $bd, 'rv-card' ) );
+} );

@@ -188,3 +188,12 @@ rk_test( 'schema: the legacy service text still outputs a Service; custom types 
 	add_filter( 'rk_builder_schema_types', function ( $t ) { $t['event'] = array( 'label' => 'Event', 'help' => '', 'build' => function ( $c, $ctx ) { return array( '@type' => 'Event', 'name' => $ctx['name'] ); } ); return $t; } );
 	t_eq( array_keys( rk_builder_schema_types() ), array( 'article', 'service', 'product', 'faq', 'event' ) );
 } );
+
+rk_test( 'robots.txt: a Sitemap line for another website is found and replaced, the rest is kept', function () {
+	$txt = "User-agent: *\r\nAllow: /\r\n\r\nSitemap: https://www.rhodeshardwoodflooring.com/sitemap_index.xml";
+	t_eq( array( 'https://www.rhodeshardwoodflooring.com/sitemap_index.xml' ), rk_builder_robots_foreign_sitemaps( $txt, 'https://peoriahardwoodfloors.com/' ) );
+	t_eq( array(), rk_builder_robots_foreign_sitemaps( "Sitemap: https://www.peoriahardwoodfloors.com/wp-sitemap.xml", 'https://peoriahardwoodfloors.com/' ) );
+	$fixed = rk_builder_robots_fixed( $txt, 'https://peoriahardwoodfloors.com/wp-sitemap.xml', 'https://peoriahardwoodfloors.com/' );
+	t_eq( "User-agent: *\nAllow: /\n\nSitemap: https://peoriahardwoodfloors.com/wp-sitemap.xml\n", $fixed );
+	t_eq( $fixed, rk_builder_robots_fixed( $fixed, 'https://peoriahardwoodfloors.com/wp-sitemap.xml', 'https://peoriahardwoodfloors.com/' ) );
+} );

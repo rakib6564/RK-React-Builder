@@ -10,6 +10,7 @@ export const Review = z.object({
   date: z.string(),
   source: z.string(),
   url: z.string(),
+  photo: z.string().optional(),
   hidden: z.boolean().optional(),
 });
 export type Review = z.infer<typeof Review>;

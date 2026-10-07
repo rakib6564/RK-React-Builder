@@ -19,7 +19,7 @@
         "id": "cover",
         "type": "coverhero",
         "props": {
-          "eyebrow": "Family owned · Central Illinois",
+          "eyebrow": "Family owned \u00b7 Central Illinois",
           "heading": "Hardwood floors, crafted & cared for",
           "sub": "Installation and refinishing.",
           "cta": "Call now",
@@ -81,7 +81,7 @@
         "type": "contactband",
         "props": {
           "heading": "Ready to talk about your floors?",
-          "sub": "Call or email — no fragile contact forms.",
+          "sub": "Call or email \u2014 no fragile contact forms.",
           "phone": "(309) 863-5246",
           "email": "hi@example.com"
         }
@@ -239,7 +239,7 @@
           "phone": "(309) 863-5246",
           "email": "hi@example.com",
           "address": "Serving Peoria & Central Illinois.",
-          "copyright": "© 2026 Peoria Hardwood Floors",
+          "copyright": "\u00a9 2026 Peoria Hardwood Floors",
           "note": "Estimates are rough guides.",
           "logoUrl": "/placeholder.svg"
         }
@@ -264,7 +264,7 @@
           "eyebrow": "Stains",
           "heading": "Tones",
           "intro": "",
-          "items": "#8a5a2b||Warm Oak|Brand · Warm|||\n#444||Gray|Brand · Gray|||\n/placeholder.svg||Pine|Plain blurb|||\n/placeholder.svg||Linked|Brand · Warm|||/contact",
+          "items": "#8a5a2b||Warm Oak|Brand \u00b7 Warm|||\n#444||Gray|Brand \u00b7 Gray|||\n/placeholder.svg||Pine|Plain blurb|||\n/placeholder.svg||Linked|Brand \u00b7 Warm|||/contact",
           "cols": 3,
           "tone": "light",
           "numbered": false,
@@ -404,6 +404,102 @@
           "showSummary": false,
           "showLinks": false,
           "tone": "light"
+        }
+      },
+      {
+        "id": "rev3",
+        "type": "reviews",
+        "props": {
+          "eyebrow": "",
+          "heading": "Reviews",
+          "intro": "",
+          "limit": 8,
+          "minRating": 1,
+          "cols": 3,
+          "showSummary": true,
+          "showLinks": true,
+          "tone": "light",
+          "layout": "carousel"
+        }
+      },
+      {
+        "id": "rev4",
+        "type": "reviews",
+        "props": {
+          "eyebrow": "",
+          "heading": "Reviews",
+          "intro": "",
+          "limit": 50,
+          "minRating": 1,
+          "cols": 4,
+          "showSummary": true,
+          "showLinks": true,
+          "tone": "light",
+          "layout": "cards"
+        }
+      },
+      {
+        "id": "rev-masonry",
+        "type": "reviews",
+        "props": {
+          "eyebrow": "",
+          "heading": "Reviews",
+          "intro": "",
+          "limit": 6,
+          "minRating": 1,
+          "cols": 4,
+          "showSummary": true,
+          "showLinks": true,
+          "tone": "light",
+          "layout": "masonry"
+        }
+      },
+      {
+        "id": "rev-list",
+        "type": "reviews",
+        "props": {
+          "eyebrow": "",
+          "heading": "Reviews",
+          "intro": "",
+          "limit": 6,
+          "minRating": 1,
+          "cols": 4,
+          "showSummary": true,
+          "showLinks": true,
+          "tone": "light",
+          "layout": "list"
+        }
+      },
+      {
+        "id": "rev-slider",
+        "type": "reviews",
+        "props": {
+          "eyebrow": "",
+          "heading": "Reviews",
+          "intro": "",
+          "limit": 6,
+          "minRating": 1,
+          "cols": 4,
+          "showSummary": true,
+          "showLinks": true,
+          "tone": "light",
+          "layout": "slider"
+        }
+      },
+      {
+        "id": "rev-badge",
+        "type": "reviews",
+        "props": {
+          "eyebrow": "",
+          "heading": "Reviews",
+          "intro": "",
+          "limit": 6,
+          "minRating": 1,
+          "cols": 4,
+          "showSummary": true,
+          "showLinks": true,
+          "tone": "light",
+          "layout": "badge"
         }
       },
       {

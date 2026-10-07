@@ -9,8 +9,22 @@ export const reviewsFields: FieldDef[] = [
     key: "limit",
     label: "Reviews to show",
     min: 1,
-    max: 12,
+    max: 50,
     help: "Add or sync reviews in Dashboard > Reviews",
+  },
+  {
+    kind: "select",
+    key: "layout",
+    label: "Layout",
+    options: [
+      { value: "grid", label: "Plain cards" },
+      { value: "carousel", label: "Carousel" },
+      { value: "slider", label: "Slider (one at a time)" },
+      { value: "cards", label: "Grid" },
+      { value: "masonry", label: "Masonry" },
+      { value: "list", label: "List" },
+      { value: "badge", label: "Card badge (rating only)" },
+    ],
   },
   {
     kind: "number",
@@ -19,7 +33,7 @@ export const reviewsFields: FieldDef[] = [
     min: 1,
     max: 5,
   },
-  { kind: "number", key: "cols", label: "Columns", min: 2, max: 3 },
+  { kind: "number", key: "cols", label: "Cards per row", min: 2, max: 4 },
   {
     kind: "checkbox",
     key: "showSummary",

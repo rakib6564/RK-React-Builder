@@ -169,12 +169,25 @@ function rk_builder_places_hex2dec( $hex ) {
 }
 
 /** What a Google Maps address contains: name, CID, Place ID (when it carries one). Pure, no network. */
+/**
+ * A Place ID (ChIJ…) from the two hex halves of a Maps feature id ("0x52b32df53ba03e3b:0x8457cad58e1c7661"): the ID is
+ * those two 64-bit numbers, little-endian, in a tiny protobuf, written as URL-safe base64. Needs no key and no request.
+ */
+function rk_builder_places_fid_to_place_id( $hex_a, $hex_b ) {
+	$a = str_pad( strtolower( ltrim( (string) $hex_a, '0' ) ), 16, '0', STR_PAD_LEFT );
+	$b = str_pad( strtolower( ltrim( (string) $hex_b, '0' ) ), 16, '0', STR_PAD_LEFT );
+	if ( 1 !== preg_match( '/^[0-9a-f]{16}\z/', $a ) || 1 !== preg_match( '/^[0-9a-f]{16}\z/', $b ) ) { return ''; }
+	$raw = "\x0a\x12\x09" . strrev( hex2bin( $a ) ) . "\x11" . strrev( hex2bin( $b ) );
+	return rtrim( strtr( base64_encode( $raw ), '+/', '-_' ), '=' );
+}
+
 function rk_builder_places_parse_link( $url ) {
 	$out = array( 'name' => '', 'placeId' => '', 'cid' => '', 'kgmid' => '' );
 	$u   = rawurldecode( (string) $url );
 	if ( preg_match( '#/maps/place/([^/@?]+)#', $u, $m ) ) { $out['name'] = rk_builder_theme_text( str_replace( '+', ' ', $m[1] ), 120 ); }
 	elseif ( preg_match( '~google\.com/(?:maps/)?search[^?]*\?(?:[^#]*&)?q=([^&]+)~', $u, $m ) && 0 !== strpos( $m[1], 'place_id:' ) ) { $out['name'] = rk_builder_theme_text( str_replace( '+', ' ', $m[1] ), 120 ); }
 	if ( preg_match( '#(?:place_id[:=]|query_place_id=|!1s)(ChIJ[A-Za-z0-9_-]{10,200})#', $u, $m ) ) { $out['placeId'] = $m[1]; }
+	if ( '' === $out['placeId'] && preg_match( '#!1s(0x[0-9a-f]{1,16}):(0x[0-9a-f]{1,16})#i', $u, $m ) ) { $out['placeId'] = rk_builder_places_fid_to_place_id( substr( $m[1], 2 ), substr( $m[2], 2 ) ); }
 	if ( preg_match( '#[?&]kgmid=(/[gm]/[A-Za-z0-9_]{3,20})#', $u, $m ) ) { $out['kgmid'] = $m[1]; }
 	if ( preg_match( '#[?&]cid=(\d{5,25})#', $u, $m ) ) { $out['cid'] = $m[1]; }
 	elseif ( preg_match( '#!1s0x[0-9a-f]+:0x([0-9a-f]{1,16})#i', $u, $m ) ) { $out['cid'] = rk_builder_places_hex2dec( $m[1] ); }
